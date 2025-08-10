@@ -66,6 +66,24 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Cache Maven dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+        
+    - name: Build JAR for Docker
+      run: |
+        cd application-source/product-service
+        mvn clean package -DskipTests
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
