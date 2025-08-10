@@ -1,0 +1,64 @@
+{
+    "pipelineName": "q-charged-cicd-pipeline",
+    "pipelineVersion": 2,
+    "stageStates": [
+        {
+            "stageName": "Source",
+            "inboundExecutions": [],
+            "inboundTransitionState": {
+                "enabled": true
+            },
+            "actionStates": [
+                {
+                    "actionName": "GitHub_Source",
+                    "entityUrl": "https://us-east-1.console.aws.amazon.com/codesuite/settings/connections/redirect?connectionArn=arn:aws:codeconnections:us-east-1:831926626327:connection/e1d949bc-a83c-4a3a-a6ca-c60014b99c12&referenceType=BRANCH&FullRepositoryId=YASHMAHAKAL/q-charged-cicd-app&Branch=master"
+                }
+            ],
+            "latestExecution": {
+                "pipelineExecutionId": "7ea9cd5b-2e4c-4acb-808d-013b4df2eed4",
+                "status": "Failed"
+            }
+        },
+        {
+            "stageName": "Build",
+            "inboundExecutions": [],
+            "inboundTransitionState": {
+                "enabled": true
+            },
+            "actionStates": [
+                {
+                    "actionName": "Build",
+                    "entityUrl": "https://console.aws.amazon.com/codebuild/home?region=us-east-1#/projects/q-charged-build/view"
+                }
+            ]
+        },
+        {
+            "stageName": "Test",
+            "inboundExecutions": [],
+            "inboundTransitionState": {
+                "enabled": true
+            },
+            "actionStates": [
+                {
+                    "actionName": "Test",
+                    "entityUrl": "https://console.aws.amazon.com/codebuild/home?region=us-east-1#/projects/q-charged-test/view"
+                }
+            ]
+        },
+        {
+            "stageName": "Deploy",
+            "inboundExecutions": [],
+            "inboundTransitionState": {
+                "enabled": true
+            },
+            "actionStates": [
+                {
+                    "actionName": "Deploy_Placeholder",
+                    "entityUrl": "https://console.aws.amazon.com/codebuild/home?region=us-east-1#/projects/q-charged-deploy/view"
+                }
+            ]
+        }
+    ],
+    "created": "2025-08-10T17:29:46.578000+05:30",
+    "updated": "2025-08-10T17:40:15.077000+05:30"
+}
