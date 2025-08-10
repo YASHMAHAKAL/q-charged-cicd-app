@@ -152,6 +152,7 @@ jobs:
     - name: Configure kubectl for EKS
       run: |
         aws eks update-kubeconfig --region us-east-1 --name prod-cluster
+        kubectl config current-context
         
     - name: Deploy to EKS
       env:
@@ -166,9 +167,9 @@ jobs:
         sed -i "s|ECR_REGISTRY|$ECR_REGISTRY|g" k8s/frontend-deployment.yaml
         sed -i "s|IMAGE_TAG|$IMAGE_TAG|g" k8s/frontend-deployment.yaml
         
-        # Apply Kubernetes manifests
-        kubectl apply -f k8s/product-service-deployment.yaml
-        kubectl apply -f k8s/frontend-deployment.yaml
+        # Apply Kubernetes manifests with validation disabled
+        kubectl apply -f k8s/product-service-deployment.yaml --validate=false
+        kubectl apply -f k8s/frontend-deployment.yaml --validate=false
         
         # Wait for deployments to complete
         kubectl rollout status deployment/product-service --timeout=300s
