@@ -88,6 +88,11 @@ class QChargedCicdStack(Stack):
             self, "ReviewServiceRepo",
             repository_name="review-service"
         )
+        
+        frontend_repo = ecr.Repository(
+            self, "FrontendRepo",
+            repository_name="frontend"
+        )
 
         # Cognito User Pool
         user_pool = cognito.UserPool(
@@ -105,5 +110,6 @@ class QChargedCicdStack(Stack):
         CfnOutput(self, "VpcId", value=vpc.vpc_id)
         CfnOutput(self, "ProductRepoUri", value=product_repo.repository_uri)
         CfnOutput(self, "ReviewRepoUri", value=review_repo.repository_uri)
+        CfnOutput(self, "FrontendRepoUri", value=frontend_repo.repository_uri)
         CfnOutput(self, "UserPoolId", value=user_pool.user_pool_id)
         CfnOutput(self, "UserPoolClientId", value=user_pool_client.user_pool_client_id)
