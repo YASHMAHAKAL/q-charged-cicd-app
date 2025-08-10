@@ -27,10 +27,23 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
         
-    - name: Build with Maven
+    - name: Build Backend with Maven
       run: |
         cd application-source/product-service
         mvn clean install -DskipTests
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+        
+    - name: Build Frontend
+      run: |
+        cd frontend
+        npm ci
+        npm run build
         
   test:
     runs-on: ubuntu-latest
@@ -53,10 +66,23 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
         
-    - name: Run tests
+    - name: Run Backend Tests
       run: |
         cd application-source/product-service
         mvn test
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+        
+    - name: Run Frontend Tests
+      run: |
+        cd frontend
+        npm ci
+        npm test -- --coverage --watchAll=false
         
   deploy:
     runs-on: ubuntu-latest
@@ -80,10 +106,23 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
         
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+        
     - name: Build JAR for Docker
       run: |
         cd application-source/product-service
         mvn clean package -DskipTests
+        
+    - name: Build Frontend for Docker
+      run: |
+        cd frontend
+        npm ci
+        npm run build
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -96,7 +135,7 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
 
-    - name: Build, tag, and push image to Amazon ECR
+    - name: Build, tag, and push backend image to Amazon ECR
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: product-service
@@ -105,8 +144,43 @@ jobs:
         cd application-source/product-service
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-
-    - name: Deploy to EKS placeholder
+        
+    - name: Build, tag, and push frontend image to Amazon ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: frontend
+        IMAGE_TAG: ${{ github.sha }}
       run: |
-        echo "Image has been pushed to ECR: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-        echo "Next step would be to run kubectl apply..."
+        cd frontend
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+    - name: Configure kubectl for EKS
+      run: |
+        aws eks update-kubeconfig --region us-east-1 --name prod-cluster
+        
+    - name: Deploy to EKS
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Update backend deployment manifest
+        sed -i "s|ECR_REGISTRY|$ECR_REGISTRY|g" k8s/product-service-deployment.yaml
+        sed -i "s|IMAGE_TAG|$IMAGE_TAG|g" k8s/product-service-deployment.yaml
+        
+        # Update frontend deployment manifest
+        sed -i "s|ECR_REGISTRY|$ECR_REGISTRY|g" k8s/frontend-deployment.yaml
+        sed -i "s|IMAGE_TAG|$IMAGE_TAG|g" k8s/frontend-deployment.yaml
+        
+        # Apply Kubernetes manifests
+        kubectl apply -f k8s/product-service-deployment.yaml
+        kubectl apply -f k8s/frontend-deployment.yaml
+        
+        # Wait for deployments to complete
+        kubectl rollout status deployment/product-service --timeout=300s
+        kubectl rollout status deployment/frontend --timeout=300s
+        
+        # Get deployment status
+        kubectl get pods -l app=product-service
+        kubectl get pods -l app=frontend
+        kubectl get services
