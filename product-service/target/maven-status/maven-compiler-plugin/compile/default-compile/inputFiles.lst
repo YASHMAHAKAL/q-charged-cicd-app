@@ -1,0 +1,9 @@
+/home/yash/q-charged-cicd/product-service/src/main/java/com/example/productservice/service/ProductService.java
+/home/yash/q-charged-cicd/product-service/src/main/java/com/example/productservice/exception/ProductAlreadyExistsException.java
+/home/yash/q-charged-cicd/product-service/src/main/java/com/example/productservice/config/OpenApiConfig.java
+/home/yash/q-charged-cicd/product-service/src/main/java/com/example/productservice/controller/ProductController.java
+/home/yash/q-charged-cicd/product-service/src/main/java/com/example/productservice/ProductServiceApplication.java
+/home/yash/q-charged-cicd/product-service/src/main/java/com/example/productservice/exception/ProductNotFoundException.java
+/home/yash/q-charged-cicd/product-service/src/main/java/com/example/productservice/exception/GlobalExceptionHandler.java
+/home/yash/q-charged-cicd/product-service/src/main/java/com/example/productservice/model/Product.java
+/home/yash/q-charged-cicd/product-service/src/main/java/com/example/productservice/repository/ProductRepository.java

@@ -1,0 +1,11 @@
+com/example/productservice/repository/ProductRepository.class
+com/example/productservice/model/Product.class
+com/example/productservice/exception/GlobalExceptionHandler$ErrorResponse.class
+com/example/productservice/exception/ProductNotFoundException.class
+com/example/productservice/controller/ProductController.class
+com/example/productservice/ProductServiceApplication.class
+com/example/productservice/config/OpenApiConfig.class
+com/example/productservice/exception/ProductAlreadyExistsException.class
+com/example/productservice/exception/GlobalExceptionHandler$ValidationErrorResponse.class
+com/example/productservice/exception/GlobalExceptionHandler.class
+com/example/productservice/service/ProductService.class
