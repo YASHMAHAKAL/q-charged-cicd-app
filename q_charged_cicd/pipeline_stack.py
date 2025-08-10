@@ -119,7 +119,7 @@ class PipelineStack(Stack):
                             action_name="GitHub_Source",
                             owner="YASHMAHAKAL",
                             repo="q-charged-cicd-app",
-                            branch="main",
+                            branch="master",
                             output=source_output,
                             connection_arn="arn:aws:codeconnections:us-east-1:831926626327:connection/e1d949bc-a83c-4a3a-a6ca-c60014b99c12"
                         )
